@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Graphy Uploader</title>
+    <style>
+        body { font-family: Arial; background: #0d1117; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+       .box { background: #161b22; padding: 40px; border-radius: 12px; border: 1px solid #30363d; text-align: center; }
+        input { margin: 20px 0; }
+        button { background: #238636; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #2ea043; }
+        #link { margin-top: 20px; word-break: break-all; }
+        a { color: #58a6ff; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Graphy Uploader</h1>
+        <p>Заливай файл и получай ссылку</p>
+        <input type="file" id="file">
+        <br>
+        <button onclick="upload()">Загрузить</button>
+        <div id="link"></div>
+    </div>
+    <script>
+        async function upload() {
+            const fileInput = document.getElementById('file');
+            const linkDiv = document.getElementById('link');
+            if (!fileInput.files[0]) {
+                linkDiv.innerHTML = 'Сначала выбери файл';
+                return;
+            }
+            linkDiv.innerHTML = 'Загружаю...';
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            try {
+                const res = await fetch('https://api.graphy.app/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.url) {
+                    linkDiv.innerHTML = `Готово: <a href="${data.url}" target="_blank">${data.url}</a>`;
+                } else {
+                    linkDiv.innerHTML = 'Ошибка: ' + JSON.stringify(data);
+                }
+            } catch (e) {
+                linkDiv.innerHTML = 'Ошибка сети. Попробуй позже.';
+            }
+        }
+    </script>
+</body>
+</html>
